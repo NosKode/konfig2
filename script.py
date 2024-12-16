@@ -3,29 +3,41 @@ import subprocess
 import sys
 import tempfile
 from graphviz import Digraph
+from datetime import datetime
 
 def get_commit_graph(repo_path, file_hash):
     """Получить граф коммитов для заданного хеша файла."""
     os.chdir(repo_path)
     commits = subprocess.check_output([
-        "git", "log", "--pretty=format:%H", "--", file_hash
+        "git", "log", "--pretty=format:%H %ct", "--", file_hash
     ]).decode("utf-8").splitlines()
 
     graph = {}
-    for commit in commits:
+    commit_data = []
+
+    for i, commit_line in enumerate(commits, 1):
+        commit_hash, commit_time = commit_line.split()
         parent_commits = subprocess.check_output([
-            "git", "log", "--pretty=%P", "-n", "1", commit
+            "git", "log", "--pretty=%P", "-n", "1", commit_hash
         ]).decode("utf-8").split()
-        graph[commit] = parent_commits
 
-    return graph
+        graph[commit_hash] = parent_commits
 
-def generate_graphviz(graph):
+        # Преобразование времени в читаемый формат
+        readable_time = datetime.utcfromtimestamp(int(commit_time)).strftime('%d %b %Y %H:%M:%S')
+        commit_data.append((i, commit_hash, readable_time))
+
+    return graph, commit_data
+
+def generate_graphviz(graph, commit_data):
     """Создать представление графа в формате Graphviz."""
     dot = Digraph()
 
+    for i, commit, commit_time in commit_data:
+        formatted_label = f"{i}. {commit}\n{commit_time}"
+        dot.node(commit, formatted_label)
+
     for commit, parents in graph.items():
-        dot.node(commit, commit)
         for parent in parents:
             dot.edge(parent, commit)
 
@@ -68,8 +80,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        graph = get_commit_graph(args.repo_path, args.file_hash)
-        dot_graph = generate_graphviz(graph)
+        graph, commit_data = get_commit_graph(args.repo_path, args.file_hash)
+        dot_graph = generate_graphviz(graph, commit_data)
         visualize_graph(args.graphviz_tool_path, dot_graph)
     except Exception as e:
         print(f"Ошибка: {e}")
