@@ -44,3 +44,10 @@ pip install graphviz
 
 ```bash
 python script.py Путь_к_dot.exe Путь_к_каталогу Путь_к_файлу.txt
+```
+## Пример работы программы
+![tmpeffep6gz](https://github.com/user-attachments/assets/e706a6dc-959f-4ea2-82ba-2ad73ef5352f)
+
+## Тесты
+![9 (1)](https://github.com/user-attachments/assets/98b860e1-9a37-41f3-9f2a-60c76ca5e564)
+
