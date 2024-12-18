@@ -43,7 +43,7 @@ pip install graphviz
 Чтобы выполнить Python-скрипт, используйте следующую команду:
 
 ```bash
-python script.py Путь_к_dot.exe Путь_к_каталогу Путь_к_файлу.txt
+python script.py Путь_к_dot.exe Путь_к_каталогу Имя_файла
 ```
 ## Пример работы программы
 ![tmpeffep6gz](https://github.com/user-attachments/assets/e706a6dc-959f-4ea2-82ba-2ad73ef5352f)
